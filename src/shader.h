@@ -1,6 +1,9 @@
+// OpenGL Learning Project shader header
+
 #ifndef SHADER_H
 #define SHADER_H
 
+// Include statements
 #include <glad/glad.h>
 
 #include <string>
@@ -8,16 +11,21 @@
 #include <sstream>
 #include <cstdio>
 
+// Shader class
 class Shader {
 public:
+	// Shader program ID
 	unsigned int ID;
 
+	// Load, compile, and link shaders from GLSL files
 	Shader(const char* vertexPath, const char* fragmentPath) {
+		// Declare variables
 		std::string vertexCode;
 		std::string fragmentCode;
 		std::ifstream vShaderFile;
 		std::ifstream fShaderFile;
 
+		// Try to open and read shader files to const char*
 		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try {
@@ -40,10 +48,12 @@ public:
 		const char* vShaderCode = vertexCode.c_str();
 		const char* fShaderCode = fragmentCode.c_str();
 
+		// Declare more variables
 		unsigned int vertex, fragment;
 		int success;
 		char infoLog[512];
 
+		// Compile vertex shader
 		vertex = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertex, 1, &vShaderCode, NULL);
 		glCompileShader(vertex);
@@ -53,6 +63,7 @@ public:
 			printf("ERROR: SHADER VERTEX COMILATION FAILED\n%s", infoLog);
 		}
 
+		// Compile fragment shader
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragment, 1, &fShaderCode, NULL);
 		glCompileShader(fragment);
@@ -62,6 +73,7 @@ public:
 			printf("ERROR: SHADER FRAGMENT COMILATION FAILED\n%s", infoLog);
 		}
 
+		// Create program, attach and link shaders
 		ID = glCreateProgram();
 		glAttachShader(ID, vertex);
 		glAttachShader(ID, fragment);
@@ -72,9 +84,10 @@ public:
 			printf("ERROR: SHADER PROGRAM LINKING FAILED\n%s", infoLog);
 		}
 
+		// Delete shaders
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
-	};
+	}
 	void use() const {
 		glUseProgram(ID);
 	}

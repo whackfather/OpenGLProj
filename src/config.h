@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// OpenGL Learning Project configuration header
+
+#pragma once
 
 // Include statements
 #include <string>

@@ -9,10 +9,10 @@ int main(void) {
     glfwInit();
     int width = 640;
     int height = 480;
-    char title[] = "Hello world.";
+    std::string title = "Le Triangl";
 
     // Create GLWF window
-    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
     if (window == NULL) {
         printf("Failed to create GLFW window.\n");
         glfwTerminate();
@@ -29,29 +29,50 @@ int main(void) {
         return -1;
     }
 
+    // Create shaders
     Shader shader("../../../src/vertexshader.vert", "../../../src/fragmentshader.frag");
     
     // Establish vertex data
     float vertices[] = {
         // positions         // colors
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
+         0.0f,  0.0f, 0.0f,  0.6f, 0.0f, 0.0f,     // right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.6f, 0.0f,     // left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 0.5f,     // top
+
+		 0.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,     // left
+		 0.5f, -0.5f, 0.0f,  0.2f, 0.2f, 0.4f,     // right
+		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,     // top
+
+        -0.5f, -0.5f, 0.0f,  0.25f, 0.8f,  0.25f,   // left
+         0.0f,  0.0f, 0.0f,  1.0f,  0.15f, 0.15f,   // top
+         0.5f, -0.5f, 0.0f,  0.4f,  0.35f, 0.8f     // right
+    };
+    // Establish index data for vertices
+    unsigned int indices[] = {
+        0, 1, 2,
+        3, 4, 5,
+        6, 7, 8
     };
 
-    unsigned int VBO, VAO;
+    // Generate vertex and element buffers, and generate vertex array
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
     
+    // Bind vertex array
     glBindVertexArray(VAO);
 
+    // Bind buffers and provide them with data
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // position attribute
+    // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
+    // Color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
@@ -61,23 +82,30 @@ int main(void) {
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // Render loop
     while (!glfwWindowShouldClose(window)) {
+        // Process input
         processInput(window);
 
+        // Clean screen with custom color
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
+        // Use shader and bind vertex array to draw elements
         shader.use();
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);   // 9 represents number of vertices we will be drawing
 
+        // Swap buffers and poll events
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    // Deallocate to free resources
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
+    // Terminate GLFW
     glfwTerminate();
     return 0;
 }
