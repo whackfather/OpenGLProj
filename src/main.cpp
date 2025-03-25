@@ -30,7 +30,7 @@ int main(void) {
     }
 
     // Create shaders
-    Shader shader("../../../src/vertexshader.vert", "../../../src/fragmentshader.frag");
+    Shader shader("../../../shader/vertexshader.vert", "../../../shader/fragmentshader.frag");
     
     // Establish vertex data
     float vertices[] = {
