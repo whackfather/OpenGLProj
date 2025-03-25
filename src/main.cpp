@@ -34,24 +34,20 @@ int main(void) {
     
     // Establish vertex data
     float vertices[] = {
-        // positions         // colors
-         0.0f,  0.0f, 0.0f,  0.6f, 0.0f, 0.0f,     // right
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.6f, 0.0f,     // left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 0.5f,     // top
-
-		 0.0f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,     // left
-		 0.5f, -0.5f, 0.0f,  0.2f, 0.2f, 0.4f,     // right
-		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,     // top
-
-        -0.5f, -0.5f, 0.0f,  0.25f, 0.8f,  0.25f,   // left
-         0.0f,  0.0f, 0.0f,  1.0f,  0.15f, 0.15f,   // top
-         0.5f, -0.5f, 0.0f,  0.4f,  0.35f, 0.8f     // right
+        // positions        // colors
+        -0.05f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
+        0.05f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
+        -0.05f, -0.2f, 0.0f,  1.0f, 1.0f, 1.0f,
+        0.05f, -0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
+        -0.08f, 0.2f, 0.0f,  1.0f, 1.0f, 1.0f,
+        0.08f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
+        0.0f, 0.35f, 0.0f,  0.2f, 0.0f, 0.4f
     };
     // Establish index data for vertices
     unsigned int indices[] = {
-        0, 1, 2,
-        3, 4, 5,
-        6, 7, 8
+        0, 1, 3,
+        0, 2, 3,
+        4, 5, 6
     };
 
     // Generate vertex and element buffers, and generate vertex array
@@ -80,7 +76,7 @@ int main(void) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
