@@ -149,3 +149,5 @@ std::string readShaderCode(const char* fileName) {
     input.close();
     return code.c_str();
 }
+
+// This is a comment
