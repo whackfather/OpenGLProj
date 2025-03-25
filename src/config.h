@@ -10,4 +10,3 @@
 // Function declarations
 void framebuffer_size_callback(GLFWwindow*, int, int);
 void processInput(GLFWwindow*);
-std::string readShaderCode(const char*);
