@@ -12,7 +12,7 @@ endif()
 project ("OpenGLProj")
 
 # Add source to this project's executable.
-add_executable (OpenGLProj "src/main.cpp" "src/config.h" "src/glad.c")
+add_executable (OpenGLProj "src/main.cpp" "src/config.h" "src/glad.c" "src/shader.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET OpenGLProj PROPERTY CXX_STANDARD 20)
