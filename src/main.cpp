@@ -83,8 +83,8 @@ int main(void) {
         float timeValue = glfwGetTime();
         float offsetx = sin(2 * timeValue);
         float offsety = cos(7 * timeValue);
-        shader.setFloat("offsetx", (GLfloat)offsetx);
-        shader.setFloat("offsety", (GLfloat)offsety);
+        shader.setFloat("offsetx", offsetx);
+        shader.setFloat("offsety", offsety);
 
         int vertexColorLocation = glGetUniformLocation(shader.ID, "ourColor");
         glUniform4f(vertexColorLocation, 0.2f, 0.0f, 0.4f, 1.0f);
