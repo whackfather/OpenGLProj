@@ -34,20 +34,13 @@ int main(void) {
     
     // Establish vertex data
     float vertices[] = {
-        // positions        // colors
-        -0.05f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
-        0.05f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
-        -0.05f, -0.2f, 0.0f,  1.0f, 1.0f, 1.0f,
-        0.05f, -0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
-        -0.08f, 0.2f, 0.0f,  1.0f, 1.0f, 1.0f,
-        0.08f, 0.2f, 0.0f,  0.2f, 0.0f, 0.4f,
-        0.0f, 0.35f, 0.0f,  0.2f, 0.0f, 0.4f
+        -0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
     };
     // Establish index data for vertices
     unsigned int indices[] = {
-        0, 1, 3,
-        0, 2, 3,
-        4, 5, 6
+        0, 1, 2
     };
 
     // Generate vertex and element buffers, and generate vertex array
@@ -66,17 +59,14 @@ int main(void) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     // Unbind buffers once we are done using them
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -89,8 +79,18 @@ int main(void) {
         
         // Use shader and bind vertex array to draw elements
         shader.use();
+
+        float timeValue = glfwGetTime();
+        float offsetx = sin(2 * timeValue);
+        float offsety = cos(7 * timeValue);
+        shader.setFloat("offsetx", (GLfloat)offsetx);
+        shader.setFloat("offsety", (GLfloat)offsety);
+
+        int vertexColorLocation = glGetUniformLocation(shader.ID, "ourColor");
+        glUniform4f(vertexColorLocation, 0.2f, 0.0f, 0.4f, 1.0f);
+
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);   // 9 represents number of vertices we will be drawing
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
@@ -113,7 +113,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 // Process input
 void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 }
