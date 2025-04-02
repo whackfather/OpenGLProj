@@ -159,6 +159,8 @@ int main() {
             opacity -= 0.01f;
         }
 
+        shader.setFloat("opacity", opacity);
+
         // Spinny spin spin
         glm::mat4 trans = glm::mat4(1.0f);   // Create translation matrix
         trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));   // Add translation information to the matrix
@@ -167,9 +169,29 @@ int main() {
         unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
-        shader.setFloat("opacity", opacity);
-
         glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+        float scaleFactor = (float)sin(glfwGetTime());
+        trans = glm::scale(trans, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));
+        trans = glm::scale(trans, glm::vec3(scaleFactor, 1.0f, 1.0f));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(-0.5f, -0.5f, 0.0f));
+        trans = glm::scale(trans, glm::vec3(1.0f, scaleFactor, 1.0f));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // Swap buffers and poll events
