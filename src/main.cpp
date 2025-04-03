@@ -7,13 +7,13 @@
 int main() {
     // Initialize GLFW
     glfwInit();
-    int width = 640;
-    int height = 480;
+    int width = 800;
+    int height = 600;
     std::string title = "Le Triangl";
 
     // Create GLWF window
-    GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-    if (window == NULL) {
+    GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    if (window == nullptr) {
         printf("Failed to create GLFW window.\n");
         glfwTerminate();
         return -1;
@@ -31,6 +31,8 @@ int main() {
 
     // Configure global OpenGL state
     glEnable(GL_DEPTH_TEST);
+    // Uncomment below for wireframe mode
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Create shaders
     Shader shader("../../../shaders/vertexshader.vert", "../../../shaders/fragmentshader.frag");
@@ -83,6 +85,19 @@ int main() {
     unsigned int indices[] = {
         0, 1, 3,
         1, 2, 3
+    };
+    // Global cube coordinates
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
     // Generate vertex and element buffers, and generate vertex array
@@ -162,9 +177,6 @@ int main() {
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
 
-    // Uncomment for wireframe mode
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         // Process input
@@ -189,18 +201,27 @@ int main() {
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
         glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f); 
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        int viewLoc = glGetUniformLocation(shader.ID, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-        int projLoc = glGetUniformLocation(shader.ID, "projection");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
+        projection = glm::perspective(glm::radians(75.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 0;
+            if (i % 3 == 0) {
+                angle = glfwGetTime() * 100;
+            }
+            else {
+                angle = 20.0f * i;
+            }
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
