@@ -3,33 +3,31 @@
 // Include configuration header file
 #include "config.h"
 #include "shader.h"
+#include "camera.h"
 
-// Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+// Window size
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
-// Framerate things
+// Timing
 float deltaTime = 0.0f;   // Time between current frame and last frame
 float lastFrame = 0.0f;   // Time of last frame
 
-// Mouse stuff
+// Camera
+glm::vec3 cameraStartPos = glm::vec3(0.0f, 0.0f, 3.0f);
+Camera camera(cameraStartPos);
+float lastX = SCR_WIDTH / 2;
+float lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
-float lastX = 400.0f;
-float lastY = 300.0f;
-float pitch = 0.0f;
-float yaw = -90.0f;
 
 // Le Main
 int main() {
     // Initialize GLFW
     glfwInit();
-    int width = 800;
-    int height = 600;
     std::string title = "Le Triangl";
 
     // Create GLWF window
-    GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
         printf("Failed to create GLFW window.\n");
         glfwTerminate();
@@ -46,8 +44,9 @@ int main() {
     }
 
     // Configure global OpenGL state
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glEnable(GL_DEPTH_TEST);
     // Uncomment below for wireframe mode
@@ -198,7 +197,8 @@ int main() {
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
+        // Timing
+        float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -218,20 +218,13 @@ int main() {
         // Use shader and bind vertex array to draw elements
         shader.use();
 
-        // Model space
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(-0.5f, 1.0f, 0.0f));
-        int modelLoc = glGetUniformLocation(shader.ID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
         // View space
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 view = camera.getViewMatrix();
         shader.setMat4("view", view);
 
         // Projection info
         glm::mat4 projection = glm::mat4(1.0f); 
-        projection = glm::perspective(glm::radians(75.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.Fov), 16.0f / 9.0f, 0.1f, 100.0f);
         shader.setMat4("projection", projection);
 
         // Render
@@ -266,7 +259,7 @@ int main() {
 }
 
 // Change viewport size
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
@@ -275,29 +268,35 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-    float cameraSpeed = 5.0f * deltaTime;
+    float sprintMult = 1.0f;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        sprintMult = 3.0f;
+    }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cameraPos += cameraSpeed * cameraFront;
+        camera.processKeyboard(FORWARD, deltaTime, sprintMult);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.processKeyboard(BACKWARD, deltaTime, sprintMult);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.processKeyboard(LEFT, deltaTime, sprintMult);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.processKeyboard(RIGHT, deltaTime, sprintMult);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        cameraPos += cameraUp * cameraSpeed;
+        camera.processKeyboard(UP, deltaTime, sprintMult);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        cameraPos -= cameraUp * cameraSpeed;
+        camera.processKeyboard(DOWN, deltaTime, sprintMult);
+    }
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        camera.Fov = 75.0f;
     }
 }
 
 // Mouse callback
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
@@ -309,25 +308,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.07f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    pitch -= yoffset;
-    yaw += xoffset;
-
-    if (pitch > 89.0f) {
-        pitch = 89.0f;
-    }
-    if (pitch < -89.0f) {
-        pitch = -89.0;
-    }
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    camera.processMouseMovement(xoffset, yoffset);
 }
 
 // Scroll callback
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    camera.processMouseScroll(static_cast<float>(yoffset));
+}
