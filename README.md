@@ -1,0 +1,2 @@
+This is a project I am doing to teach myself OpenGL. Most of this code is nearly directly copied from [Learn OpenGL](https://learnopengl.com), which is a resource I highly recommend if you are going to start learning OpenGL.
+This project is built using CMake and the executable doesn't get pushed to the repo. So, if you'd like to see the progress I've made in action, download the repo and build it using CMake.
