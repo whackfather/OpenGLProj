@@ -17,6 +17,7 @@
 #include "stb_image.h"
 
 // Function declarations
-void framebuffer_size_callback(GLFWwindow*, int, int);
+void framebufferSizeCallback(GLFWwindow*, int, int);
 void processInput(GLFWwindow* );
-void mouse_callback(GLFWwindow*, double, double);
+void mouseCallback(GLFWwindow*, double, double);
+void scrollCallback(GLFWwindow*, double, double);
