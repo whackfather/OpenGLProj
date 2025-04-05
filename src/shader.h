@@ -14,7 +14,7 @@
 
 // Shader class
 class Shader {
-	public:
+public:
 	// Shader program ID
 	unsigned int ID;
 
@@ -90,10 +90,12 @@ class Shader {
 		glDeleteShader(fragment);
 	}
 
+	// Activate shader program
 	void use() const {
 		glUseProgram(ID);
 	}
 
+	// Set shader uniforms
 	void setBool(const std::string& name, bool value) const {
 		glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 	}
