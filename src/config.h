@@ -18,4 +18,5 @@
 
 // Function declarations
 void framebuffer_size_callback(GLFWwindow*, int, int);
-void processInput(GLFWwindow*);
+void processInput(GLFWwindow* );
+void mouse_callback(GLFWwindow*, double, double);
